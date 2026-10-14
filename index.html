@@ -945,7 +945,7 @@
   }
 
   // 전체 입장 비밀번호 사용 여부. false = 누구나 메인·OT 열람, STEP별 비밀번호로만 잠금
-  var GATE_ENABLED = false;
+  var GATE_ENABLED = true;
 
   if (!GATE_ENABLED || safeGetStorage("donbeol_auth_pass") === GATE_PASSWORD) {
     document.getElementById("gate-overlay").style.display = "none";
