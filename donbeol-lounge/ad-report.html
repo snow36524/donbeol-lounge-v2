@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>돈벌자매 - 광고 보고서 분석기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans KR', -apple-system, sans-serif;
+  background: #f5f6f8;
+  color: #1a1a2e;
+  min-height: 100vh;
+}
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+.header {
+  text-align: center;
+  padding: 40px 20px 30px;
+}
+.brand { font-size: 1rem; font-weight: 800; color: #6c5ce7; letter-spacing: 1px; margin-bottom: 2px; }
+.header h1 { font-size: 1.8rem; color: #1a1a2e; font-weight: 700; margin-bottom: 6px; }
+.header p { color: #9ca3af; font-size: 0.95rem; }
+
+/* Upload */
+.upload-area {
+  border: 2px dashed #d1d5db;
+  border-radius: 20px;
+  padding: 60px 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: #fff;
+  margin-bottom: 30px;
+}
+.upload-area:hover, .upload-area.dragover { border-color: #6c5ce7; background: #f8f7ff; }
+.upload-icon { font-size: 3.5rem; margin-bottom: 14px; }
+.upload-text { font-size: 1.1rem; color: #6b7280; }
+.upload-text strong { color: #6c5ce7; }
+.upload-sub { font-size: 0.85rem; color: #9ca3af; margin-top: 8px; }
+#fileInput { display: none; }
+
+/* File bar */
+.file-bar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 14px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.file-bar.show { display: flex; }
+.file-bar .name { color: #6c5ce7; font-weight: 600; font-size: 0.9rem; }
+.file-bar .rows { color: #9ca3af; font-size: 0.85rem; margin-left: 8px; }
+.btn-reset {
+  background: #fff; border: 1px solid #e5e7eb; color: #ef4444;
+  padding: 6px 16px; border-radius: 8px; cursor: pointer; font-size: 0.85rem;
+}
+.btn-reset:hover { background: #fef2f2; border-color: #ef4444; }
+
+/* Revenue adjust */
+.adjust-bar {
+  display: none;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.adjust-bar.show { display: block; }
+.adjust-bar h4 { font-size: 0.95rem; color: #6c5ce7; margin-bottom: 10px; }
+.adjust-row {
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: end;
+}
+.adjust-row label { display: block; font-size: 0.78rem; color: #6b7280; margin-bottom: 3px; }
+.adjust-row select, .adjust-row input {
+  padding: 8px 12px; background: #f9fafb; border: 1px solid #d1d5db;
+  border-radius: 8px; color: #1a1a2e; font-size: 0.9rem;
+}
+.adjust-row select { cursor: pointer; }
+.adjust-hint { font-size: 0.78rem; color: #10b981; margin-top: 6px; }
+.btn-re {
+  background: #6c5ce7; border: none; color: #fff; padding: 9px 22px;
+  border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+}
+.btn-re:hover { opacity: 0.9; }
+
+/* Dashboard */
+#dashboard { display: none; }
+#dashboard.show { display: block; }
+
+/* Big result card */
+.result-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 28px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.result-card.highlight {
+  background: linear-gradient(135deg, #6c5ce7, #8b5cf6);
+  color: #fff;
+  border: none;
+}
+.result-card.highlight .rc-label { color: rgba(255,255,255,0.8); }
+.result-card.highlight .rc-value { color: #fff; }
+
+.rc-label {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.rc-value {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.rc-sub {
+  font-size: 0.88rem;
+  margin-top: 6px;
+  font-weight: 400;
+}
+
+/* Two column */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* Verdict badge */
+.verdict {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-top: 8px;
+}
+.verdict.good { background: #d1fae5; color: #059669; }
+.verdict.bad { background: #fee2e2; color: #dc2626; }
+.verdict.warn { background: #fef3c7; color: #d97706; }
+
+/* Keyword list cards */
+.kw-section {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.kw-section h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.kw-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+.kw-item:last-child { border-bottom: none; }
+.kw-rank {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 700; color: #6b7280;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.kw-name {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1a1a2e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.kw-right {
+  text-align: right;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+.kw-right .main {
+  font-size: 1rem;
+  font-weight: 700;
+}
+.kw-right .sub {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+.green { color: #10b981; }
+.red { color: #ef4444; }
+.orange { color: #f59e0b; }
+
+/* Tip card */
+.tip-card {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+.tip-card h4 { font-size: 0.95rem; color: #d97706; margin-bottom: 8px; }
+.tip-card p { font-size: 0.88rem; color: #92400e; line-height: 1.6; }
+
+/* Export */
+.export-area {
+  text-align: center;
+  padding: 20px 0 40px;
+}
+.btn-export {
+  background: #fff; border: 1px solid #d1d5db; color: #374151;
+  padding: 10px 28px; border-radius: 10px; cursor: pointer;
+  font-size: 0.9rem; font-weight: 500;
+}
+.btn-export:hover { border-color: #6c5ce7; color: #6c5ce7; }
+
+/* Login screen */
+.login-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  text-align: center;
+}
+.login-screen .brand { font-size: 1.2rem; margin-bottom: 4px; }
+.login-screen h2 { font-size: 1.6rem; color: #1a1a2e; margin-bottom: 8px; }
+.login-screen p { color: #9ca3af; margin-bottom: 32px; font-size: 0.95rem; }
+.btn-google {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: #fff; border: 1px solid #d1d5db; border-radius: 12px;
+  padding: 14px 32px; font-size: 1rem; font-weight: 600;
+  color: #374151; cursor: pointer; transition: all 0.2s;
+  font-family: 'Noto Sans KR', sans-serif;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.btn-google:hover { border-color: #6c5ce7; box-shadow: 0 4px 12px rgba(108,92,231,0.15); }
+.btn-google img { width: 22px; height: 22px; }
+.user-bar {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 10px; padding: 8px 0; margin-bottom: 4px;
+}
+.user-bar img { width: 28px; height: 28px; border-radius: 50%; }
+.user-bar span { font-size: 0.82rem; color: #6b7280; }
+.btn-logout {
+  background: none; border: 1px solid #e5e7eb; color: #9ca3af;
+  padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.78rem;
+}
+.btn-logout:hover { border-color: #ef4444; color: #ef4444; }
+
+/* Loading */
+.loading { display: none; text-align: center; padding: 60px 20px; }
+.loading.show { display: block; }
+.spinner {
+  width: 44px; height: 44px;
+  border: 3px solid #e5e7eb; border-top-color: #6c5ce7;
+  border-radius: 50%; animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading p { color: #6b7280; font-size: 0.95rem; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .two-col { grid-template-columns: 1fr; }
+  .rc-value { font-size: 1.8rem; }
+  .container { padding: 12px; }
+  .result-card { padding: 24px 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Login Screen -->
+  <div class="login-screen" id="loginScreen">
+    <div class="brand">돈벌자매</div>
+    <h2>내 광고, 돈 벌고 있을까?</h2>
+    <p>로그인 후 광고 보고서를 분석해 보세요</p>
+    <button class="btn-google" id="btnGoogleLogin">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Google 계정으로 로그인
+    </button>
+  </div>
+
+  <!-- App Content (hidden until login) -->
+  <div id="appContent" style="display:none;">
+  <div class="user-bar" id="userBar">
+    <img id="userPhoto" src="" alt="">
+    <span id="userName"></span>
+    <button class="btn-logout" id="btnLogout">로그아웃</button>
+  </div>
+
+  <div class="header">
+    <div class="brand">돈벌자매</div>
+    <h1>내 광고, 돈 벌고 있을까?</h1>
+    <p>광고 보고서를 넣으면 한눈에 알려드려요</p>
+  </div>
+
+  <div class="upload-area" id="uploadArea">
+    <div class="upload-icon">📂</div>
+    <div class="upload-text">광고 보고서 파일을 <strong>여기에</strong> 올려주세요</div>
+    <div class="upload-sub">쿠팡, 네이버, 구글 광고 보고서 (.xlsx, .csv)</div>
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
+  </div>
+
+  <div class="file-bar" id="fileBar">
+    <div><span class="name" id="fileName"></span><span class="rows" id="fileRows"></span></div>
+    <button class="btn-reset" id="btnReset">다시 분석</button>
+  </div>
+
+  <div class="adjust-bar" id="adjustBar">
+    <h4>💰 실제 판매가로 보정하기</h4>
+    <div class="adjust-row">
+      <div style="flex:1;min-width:140px;">
+        <label>보정 방식</label>
+        <select id="adjustMethod" style="width:100%;">
+          <option value="none">보정 안 함</option>
+          <option value="rate">쿠폰 할인율 (%)</option>
+          <option value="price">실제 객단가 입력</option>
+        </select>
+      </div>
+      <div id="rateWrap" style="flex:1;min-width:140px;display:none;">
+        <label>할인율 (%)</label>
+        <input type="number" id="adjustRate" placeholder="예: 20" min="0" max="100" style="width:100%;">
+      </div>
+      <div id="priceWrap" style="flex:1;min-width:140px;display:none;">
+        <label>실제 객단가 (원)</label>
+        <input type="text" id="adjustPrice" placeholder="예: 22800" style="width:100%;">
+      </div>
+      <button class="btn-re" id="btnRe">재분석</button>
+    </div>
+    <div class="adjust-hint" id="adjustHint"></div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <p>보고서 분석 중...</p>
+  </div>
+
+  <div id="dashboard"></div>
+  </div><!-- /appContent -->
+</div>
+
+<script>
+// ============ FIREBASE AUTH ============
+// 로그인 없이 바로 사용. 구글 로그인을 다시 켜려면 true로 바꾸세요.
+const REQUIRE_LOGIN = false;
+if (!REQUIRE_LOGIN) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appContent').style.display = 'block';
+  document.getElementById('userBar').style.display = 'none';
+}
+const firebaseConfig = {
+  apiKey: "AIzaSyD4lgQjG_UZXpalJXDiW9jEaw28uhI3Km0",
+  authDomain: "donbuljamae-tools.firebaseapp.com",
+  projectId: "donbuljamae-tools",
+  storageBucket: "donbuljamae-tools.firebasestorage.app",
+  messagingSenderId: "908116115151",
+  appId: "1:908116115151:web:d552c5cecf2a7360d701ba",
+  measurementId: "G-TVK4V69M7T"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+document.getElementById('btnGoogleLogin').addEventListener('click', () => {
+  auth.signInWithPopup(provider).catch(err => {
+    if (err.code === 'auth/popup-blocked') {
+      alert('팝업이 차단되었습니다. 브라우저 주소창 오른쪽의 팝업 차단 아이콘을 클릭해서 허용해 주세요.');
+    } else if (err.code !== 'auth/popup-closed-by-user') {
+      alert('로그인 오류: ' + err.message);
+    }
+  });
+});
+document.getElementById('btnLogout').addEventListener('click', () => auth.signOut());
+
+if (REQUIRE_LOGIN) auth.onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+    document.getElementById('userPhoto').src = user.photoURL || '';
+    document.getElementById('userName').textContent = user.displayName || user.email;
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('appContent').style.display = 'none';
+  }
+});
+</script>
+
+<script>
+// ============ COLUMN ALIASES ============
+const COLUMN_ALIASES = {
+  keyword: ['키워드', 'keyword', 'keywords', '검색어', 'search term', 'search query', '쿼리', 'query', '소재명', 'ad name'],
+  impressions: ['노출수', '노출', 'impressions', 'impr', '노출 수'],
+  clicks: ['클릭수', '클릭', 'clicks', 'click', '클릭 수'],
+  cost: ['광고비', '비용', 'cost', 'spend', 'amount spent', '총비용', '광고비용', '소진액'],
+  conversions: ['총 주문수(1일)', '총 주문수(14일)', '전환수', '전환', 'conversions', 'conv', '주문수', '구매'],
+  revenue: ['총 전환매출액(1일)', '총 전환매출액(14일)', '매출', '매출액', 'revenue', 'conversion value', '전환매출액', '전환매출', '주문금액'],
+  ctr: ['클릭률', 'ctr'],
+  campaign: ['캠페인명', '캠페인', 'campaign'],
+  adgroup: ['광고그룹', 'ad group', 'adgroup']
+};
+
+let rawData = [], headers = [], columnMap = {}, analysisData = [];
+const usedColumns = new Set();
+
+// ============ UPLOAD ============
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+uploadArea.addEventListener('click', () => fileInput.click());
+uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+uploadArea.addEventListener('drop', e => {
+  e.preventDefault(); uploadArea.classList.remove('dragover');
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+document.getElementById('btnReset').addEventListener('click', () => location.reload());
+
+function handleFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: '' });
+      if (!json.length) { alert('데이터가 없습니다.'); return; }
+      rawData = json;
+      headers = Object.keys(json[0]);
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('fileRows').textContent = ` · ${json.length}행`;
+      document.getElementById('fileBar').classList.add('show');
+      uploadArea.style.display = 'none';
+      autoMap();
+      if (columnMap.keyword) startAnalysis();
+    } catch (err) { alert('파일 오류: ' + err.message); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function autoMap() {
+  usedColumns.clear();
+  columnMap = {};
+  const normalize = s => s.toLowerCase().trim().replace(/\s+/g, '');
+  Object.keys(COLUMN_ALIASES).forEach(key => {
+    const aliases = COLUMN_ALIASES[key];
+    for (const alias of aliases) {
+      const found = headers.find(h => !usedColumns.has(h) && normalize(h) === normalize(alias));
+      if (found) { usedColumns.add(found); columnMap[key] = found; return; }
+    }
+    for (const alias of aliases) {
+      const candidates = headers.filter(h => !usedColumns.has(h) && normalize(h).includes(normalize(alias))).sort((a, b) => a.length - b.length);
+      if (candidates.length) { usedColumns.add(candidates[0]); columnMap[key] = candidates[0]; return; }
+    }
+  });
+}
+
+function num(val) {
+  if (val === null || val === undefined || val === '') return 0;
+  if (typeof val === 'number') return val;
+  return parseFloat(String(val).replace(/[,\s%원₩$]/g, '')) || 0;
+}
+
+function startAnalysis() {
+  document.getElementById('loading').classList.add('show');
+  setTimeout(() => {
+    processData();
+    document.getElementById('loading').classList.remove('show');
+    document.getElementById('dashboard').classList.add('show');
+    document.getElementById('adjustBar').classList.add('show');
+    setupAdjust();
+    render();
+  }, 400);
+}
+
+function getAdjustment() {
+  const m = document.getElementById('adjustMethod').value;
+  if (m === 'rate') return { mode: 'rate', multiplier: (100 - (parseFloat(document.getElementById('adjustRate').value) || 0)) / 100 };
+  if (m === 'price') return { mode: 'price', unitPrice: num(document.getElementById('adjustPrice').value) };
+  return { mode: 'none' };
+}
+
+function processData() {
+  const adj = getAdjustment();
+  analysisData = rawData.map(row => {
+    const d = {};
+    d.keyword = columnMap.keyword ? String(row[columnMap.keyword] || '').trim() : '';
+    d.impressions = columnMap.impressions ? num(row[columnMap.impressions]) : 0;
+    d.clicks = columnMap.clicks ? num(row[columnMap.clicks]) : 0;
+    d.cost = columnMap.cost ? num(row[columnMap.cost]) : 0;
+    d.conversions = columnMap.conversions ? num(row[columnMap.conversions]) : 0;
+    d.revenueRaw = columnMap.revenue ? num(row[columnMap.revenue]) : 0;
+    if (adj.mode === 'price' && adj.unitPrice > 0) d.revenue = adj.unitPrice * d.conversions;
+    else if (adj.mode === 'rate') d.revenue = d.revenueRaw * adj.multiplier;
+    else d.revenue = d.revenueRaw;
+    d.profit = d.revenue - d.cost;
+    d.roas = d.cost > 0 ? (d.revenue / d.cost) * 100 : 0;
+    return d;
+  }).filter(d => d.keyword);
+}
+
+// ============ ADJUST ============
+function setupAdjust() {
+  const sel = document.getElementById('adjustMethod');
+  const updateUI = () => {
+    document.getElementById('rateWrap').style.display = sel.value === 'rate' ? 'block' : 'none';
+    document.getElementById('priceWrap').style.display = sel.value === 'price' ? 'block' : 'none';
+  };
+  sel.addEventListener('change', updateUI);
+  updateUI();
+
+  document.getElementById('adjustPrice').addEventListener('input', () => {
+    const p = num(document.getElementById('adjustPrice').value);
+    const totalConv = analysisData.reduce((s, d) => s + d.conversions, 0);
+    document.getElementById('adjustHint').textContent = p > 0 && totalConv > 0
+      ? `객단가 ₩${Math.round(p).toLocaleString()} × ${totalConv}건 = 실제 매출 ₩${Math.round(p * totalConv).toLocaleString()}`
+      : '';
+  });
+
+  document.getElementById('btnRe').addEventListener('click', () => {
+    processData();
+    render();
+  });
+}
+
+// ============ RENDER ============
+function fmt(n) { return '₩' + Math.round(n).toLocaleString(); }
+
+function render() {
+  const dash = document.getElementById('dashboard');
+  const t = analysisData.reduce((a, d) => {
+    a.cost += d.cost; a.revenue += d.revenue;
+    a.conversions += d.conversions; a.clicks += d.clicks; a.impressions += d.impressions;
+    return a;
+  }, { cost: 0, revenue: 0, conversions: 0, clicks: 0, impressions: 0 });
+
+  const profit = t.revenue - t.cost;
+  const roas = t.cost > 0 ? (t.revenue / t.cost) * 100 : 0;
+  const profitKw = analysisData.filter(d => d.profit > 0).sort((a, b) => b.profit - a.profit);
+  const lossKw = analysisData.filter(d => d.cost > 0 && d.conversions === 0).sort((a, b) => b.cost - a.cost);
+  const topRevKw = analysisData.filter(d => d.revenue > 0).sort((a, b) => b.revenue - a.revenue);
+
+  // Verdict
+  let verdictClass, verdictText;
+  if (roas >= 300) { verdictClass = 'good'; verdictText = '잘하고 있어요! 광고가 돈을 벌고 있습니다'; }
+  else if (roas >= 100) { verdictClass = 'warn'; verdictText = '본전은 뽑고 있지만, 개선이 필요해요'; }
+  else { verdictClass = 'bad'; verdictText = '광고비가 매출보다 많아요. 키워드 점검이 필요합니다'; }
+
+  let html = '';
+
+  // === 핵심 결과 ===
+  html += `
+    <div class="result-card highlight">
+      <div class="rc-label">내 광고 성적표</div>
+      <div class="rc-value">${profit >= 0 ? '+' : ''}${fmt(profit)}</div>
+      <div class="rc-sub">광고로 ${profit >= 0 ? '번' : '잃은'} 금액 (매출 - 광고비)</div>
+      <div class="verdict ${verdictClass}">${verdictText}</div>
+    </div>
+  `;
+
+  // === 광고비 vs 매출 ===
+  html += `<div class="two-col">
+    <div class="result-card">
+      <div class="rc-label">💸 쓴 광고비</div>
+      <div class="rc-value">${fmt(t.cost)}</div>
+      <div class="rc-sub" style="color:#9ca3af;font-size:0.78rem;">*부가세 제외 금액입니다. 부가세는 추후 확인해주세요.</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-label">💰 벌어온 매출</div>
+      <div class="rc-value" style="color:${t.revenue > t.cost ? '#10b981' : '#ef4444'}">${fmt(t.revenue)}</div>
+    </div>
+  </div>`;
+
+  // === ROAS (쉽게 설명) ===
+  html += `
+    <div class="result-card">
+      <div class="rc-label">광고비 대비 매출 (ROAS)</div>
+      <div class="rc-value" style="color:${roas >= 100 ? '#10b981' : '#ef4444'}">${Math.round(roas)}%</div>
+      <div class="rc-sub" style="color:#6b7280;">
+        광고비 <strong>1만원</strong> 쓸 때마다 <strong style="color:${roas >= 100 ? '#10b981' : '#ef4444'}">${fmt(Math.round(10000 * roas / 100))}</strong>의 매출이 생겨요
+        ${roas < 100 ? '<br>⚠️ 100% 미만이면 광고비보다 매출이 적다는 뜻이에요' : ''}
+      </div>
+    </div>
+  `;
+
+  // === 전환 요약 ===
+  html += `<div class="two-col">
+    <div class="result-card">
+      <div class="rc-label">👆 광고 클릭한 사람</div>
+      <div class="rc-value">${t.clicks.toLocaleString()}명</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-label">🛒 실제 구매한 사람</div>
+      <div class="rc-value" style="color:#6c5ce7;">${t.conversions.toLocaleString()}명</div>
+      <div class="rc-sub" style="color:#6b7280;">${t.clicks > 0 ? Math.round(t.clicks / Math.max(t.conversions, 1)) : 0}명 클릭 중 1명이 구매</div>
+    </div>
+  </div>`;
+
+  // === 돈 버는 키워드 ===
+  if (topRevKw.length) {
+    html += `<div class="kw-section"><h3>🏆 매출이 나는 키워드</h3>`;
+    topRevKw.slice(0, 10).forEach((d, i) => {
+      html += `<div class="kw-item">
+        <div class="kw-rank">${i + 1}</div>
+        <div class="kw-name">${d.keyword}</div>
+        <div class="kw-right">
+          <div class="main green">${fmt(d.revenue)}</div>
+          <div class="sub">지출 ${fmt(d.cost)} · ${d.conversions}건</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // === 수익 키워드 (매출 - 광고비 > 0) ===
+  if (profitKw.length) {
+    html += `<div class="kw-section"><h3>✅ 돈 버는 키워드 (순이익 +)</h3>`;
+    profitKw.slice(0, 7).forEach((d, i) => {
+      html += `<div class="kw-item">
+        <div class="kw-rank" style="background:#d1fae5;color:#059669;">${i + 1}</div>
+        <div class="kw-name">${d.keyword}</div>
+        <div class="kw-right">
+          <div class="main green">+${fmt(d.profit)}</div>
+          <div class="sub">매출 ${fmt(d.revenue)} − 지출 ${fmt(d.cost)}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // === 돈 잃는 키워드 ===
+  if (lossKw.length) {
+    html += `<div class="kw-section"><h3>🚨 광고비만 쓰고 판매 0건인 키워드</h3>`;
+    lossKw.slice(0, 7).forEach((d, i) => {
+      html += `<div class="kw-item">
+        <div class="kw-rank" style="background:#fee2e2;color:#dc2626;">${i + 1}</div>
+        <div class="kw-name">${d.keyword}</div>
+        <div class="kw-right">
+          <div class="main red">${fmt(d.cost)} 낭비</div>
+          <div class="sub">클릭 ${d.clicks}회 · 판매 0건</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // === 내보내기 ===
+  html += `<div class="export-area">
+    <button class="btn-export" id="btnExport">분석 결과 엑셀로 저장</button>
+  </div>`;
+
+  dash.innerHTML = html;
+
+  document.getElementById('btnExport').addEventListener('click', () => {
+    const exportData = analysisData.map(d => ({
+      '키워드': d.keyword, '매출': d.revenue, '광고비': d.cost,
+      '순이익': Math.round(d.profit), 'ROAS(%)': Math.round(d.roas),
+      '전환수': d.conversions, '클릭수': d.clicks
+    }));
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '분석결과');
+    XLSX.writeFile(wb, '광고분석_돈벌자매.xlsx');
+  });
+}
+</script>
+</body>
+</html>

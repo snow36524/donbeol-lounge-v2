@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>돈벌자매 라운지</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    /* brand */
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --primary-light: #eef2ff;
+    --accent: #f97316;
+    --accent-light: #fff7ed;
+    --success: #10b981;
+    --success-light: #ecfdf5;
+    --success-text: #065f46;
+    --success-border: #a7f3d0;
+    --danger: #ef4444;
+    --danger-light: #fef2f2;
+    --danger-text: #991b1b;
+    --danger-border: #fecaca;
+    --warning: #eab308;
+
+    /* text */
+    --heading: #0f172a;
+    --text-main: #1f2937;
+    --text-strong: #1e293b;
+    --text-body: #334155;
+    --text-soft: #475569;
+    --text-muted: #6b7280;
+    --text-faint: #94a3b8;
+
+    /* surfaces */
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --surface-alt: #f8fafc;
+    --surface-alt-2: #fafafa;
+    --border: #e5e7eb;
+    --border-soft: #edf2f7;
+    --border-track: #e2e8f0;
+    --border-strong: #cbd5e1;
+
+    --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 20px 45px -10px rgba(15, 23, 42, 0.28);
+
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --primary: #818cf8;
+      --primary-dark: #6366f1;
+      --primary-light: rgba(99, 102, 241, 0.18);
+      --accent: #fb923c;
+      --accent-light: rgba(249, 115, 22, 0.16);
+      --success: #34d399;
+      --success-light: rgba(16, 185, 129, 0.16);
+      --success-text: #6ee7b7;
+      --success-border: rgba(52, 211, 153, 0.35);
+      --danger: #f87171;
+      --danger-light: rgba(239, 68, 68, 0.16);
+      --danger-text: #fca5a5;
+      --danger-border: rgba(248, 113, 113, 0.35);
+      --warning: #facc15;
+
+      --heading: #f1f5f9;
+      --text-main: #e2e8f0;
+      --text-strong: #e2e8f0;
+      --text-body: #cbd5e1;
+      --text-soft: #b0bccb;
+      --text-muted: #94a3b8;
+      --text-faint: #64748b;
+
+      --bg: #0a0f1c;
+      --card-bg: #121a2c;
+      --surface-alt: #0e1524;
+      --surface-alt-2: #101828;
+      --border: #223049;
+      --border-soft: #1c2740;
+      --border-track: #263450;
+      --border-strong: #33456b;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 20px 45px -10px rgba(0, 0, 0, 0.55);
+      color-scheme: dark;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --primary: #818cf8;
+    --primary-dark: #6366f1;
+    --primary-light: rgba(99, 102, 241, 0.18);
+    --accent: #fb923c;
+    --accent-light: rgba(249, 115, 22, 0.16);
+    --success: #34d399;
+    --success-light: rgba(16, 185, 129, 0.16);
+    --success-text: #6ee7b7;
+    --success-border: rgba(52, 211, 153, 0.35);
+    --danger: #f87171;
+    --danger-light: rgba(239, 68, 68, 0.16);
+    --danger-text: #fca5a5;
+    --danger-border: rgba(248, 113, 113, 0.35);
+    --warning: #facc15;
+
+    --heading: #f1f5f9;
+    --text-main: #e2e8f0;
+    --text-strong: #e2e8f0;
+    --text-body: #cbd5e1;
+    --text-soft: #b0bccb;
+    --text-muted: #94a3b8;
+    --text-faint: #64748b;
+
+    --bg: #0a0f1c;
+    --card-bg: #121a2c;
+    --surface-alt: #0e1524;
+    --surface-alt-2: #101828;
+    --border: #223049;
+    --border-soft: #1c2740;
+    --border-track: #263450;
+    --border-strong: #33456b;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 20px 45px -10px rgba(0, 0, 0, 0.55);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, "Malgun Gothic", "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg);
+    color: var(--text-main);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Passcode Gate */
+  #gate-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 10, 20, 0.86);
+    backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .gate-card {
+    background: var(--card-bg);
+    max-width: 400px;
+    width: 100%;
+    padding: 40px 32px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid var(--border);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.94); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .gate-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 18px;
+  }
+
+  .gate-title { font-size: 21px; font-weight: 800; color: var(--heading); margin-bottom: 8px; }
+  .gate-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 22px; }
+
+  .gate-input {
+    width: 100%;
+    padding: 13px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    margin-bottom: 12px;
+    text-align: center;
+    letter-spacing: 2px;
+    outline: none;
+    background: var(--surface-alt);
+    color: var(--text-main);
+    transition: border-color 0.2s;
+  }
+
+  .gate-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
+  }
+
+  .gate-btn {
+    width: 100%;
+    padding: 13px;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .gate-btn:hover { background: var(--primary-dark); }
+  .gate-btn:focus-visible, .tool-btn:focus-visible, .vod-play-btn:focus-visible,
+  .btn-submit:focus-visible, .btn-copy:focus-visible, .step-header:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  .gate-error {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--danger-text);
+    display: none;
+    font-weight: 600;
+  }
+
+  /* Layout */
+  .app-container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 32px 16px 80px;
+  }
+
+  .header { text-align: center; margin-bottom: 36px; padding-top: 8px; }
+
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-size: clamp(24px, 5vw, 34px);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 10px;
+    color: var(--heading);
+    text-wrap: balance;
+  }
+
+  .header p { font-size: 16px; color: var(--text-muted); max-width: 600px; margin: 0 auto; }
+
+  .section-title {
+    font-size: 19px;
+    font-weight: 800;
+    color: var(--heading);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .section-title .ico { font-size: 18px; }
+
+  /* Roadmap */
+  .roadmap-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    padding: 22px 16px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 32px;
+    overflow-x: auto;
+  }
+
+  .roadmap-track {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    min-width: 720px;
+    position: relative;
+    padding: 10px;
+  }
+
+  .roadmap-track::before {
+    content: "";
+    position: absolute;
+    top: 32px;
+    left: 40px;
+    right: 40px;
+    height: 3px;
+    background: var(--border-track);
+    z-index: 1;
+  }
+
+  .roadmap-step {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 88px;
+  }
+
+  .step-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--card-bg);
+    border: 3px solid var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+
+  .step-circle.active {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 0 0 5px var(--primary-light);
+  }
+
+  .step-title { font-size: 13px; font-weight: 700; color: var(--text-body); line-height: 1.3; }
+  .step-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+
+
+  /* 8단계 맵: 단계별 그라데이션 */
+  .roadmap-track::before { background: linear-gradient(90deg, #a5b4fc, #4338ca); }
+  .roadmap-step .step-circle { color: #fff; box-shadow: 0 2px 6px rgba(67, 56, 202, 0.25); }
+  .roadmap-step:nth-child(1) .step-circle { background: #a5b4fc; border-color: #a5b4fc; }
+  .roadmap-step:nth-child(2) .step-circle { background: #97a2f5; border-color: #97a2f5; }
+  .roadmap-step:nth-child(3) .step-circle { background: #8991ee; border-color: #8991ee; }
+  .roadmap-step:nth-child(4) .step-circle { background: #7b7fe7; border-color: #7b7fe7; }
+  .roadmap-step:nth-child(5) .step-circle { background: #6d6ddf; border-color: #6d6ddf; }
+  .roadmap-step:nth-child(6) .step-circle { background: #5f5bd8; border-color: #5f5bd8; }
+  .roadmap-step:nth-child(7) .step-circle { background: #514ad1; border-color: #514ad1; }
+  .roadmap-step:nth-child(8) .step-circle { background: #4338ca; border-color: #4338ca; }
+
+  /* Toolbar */
+  .toolbar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+    margin-bottom: 40px;
+  }
+
+  .tool-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 18px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--text-main);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+  }
+
+  .tool-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
+
+  .tool-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .icon-excel { background: var(--success-light); }
+  .icon-calc { background: var(--accent-light); }
+  .icon-gpt { background: var(--primary-light); }
+  .icon-cn { background: var(--danger-light); }
+
+  .tool-info h4 { font-size: 15px; font-weight: 700; color: var(--text-strong); margin-bottom: 2px; }
+  .tool-info p { font-size: 12px; color: var(--text-muted); }
+
+  /* Step cards */
+  .step-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .step-card:hover { border-color: var(--border-strong); }
+
+  .step-header {
+    padding: 20px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    width: 100%;
+    border-left: none; border-right: none; border-top: none;
+    color: inherit;
+    font: inherit;
+  }
+
+  .step-header-left { display: flex; align-items: center; gap: 14px; text-align: left; }
+
+  .step-tag {
+    font-size: 12px;
+    font-weight: 800;
+    padding: 5px 10px;
+    border-radius: 6px;
+    background: var(--primary-light);
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+
+  .step-header h3 { font-size: 17px; font-weight: 800; color: var(--heading); }
+
+  .step-toggle-icon {
+    font-size: 14px;
+    color: var(--text-faint);
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+  }
+
+  .step-card.active .step-toggle-icon { transform: rotate(180deg); }
+
+  .step-body { padding: 24px; display: none; background: var(--surface-alt-2); }
+  .step-card.active .step-body { display: block; }
+
+  .module-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .module-box:last-child { margin-bottom: 0; }
+
+  .module-title {
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: var(--text-strong);
+  }
+
+  .vod-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .vod-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 12px 14px;
+    background: var(--surface-alt);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-soft);
+  }
+
+  .vod-item-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .vod-item-title { font-size: 13.5px; font-weight: 600; color: var(--text-body); }
+
+  .vod-play-btn {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    padding: 6px 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .vod-play-btn:hover { background: var(--primary-light); border-color: var(--primary); }
+
+  .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .comparison-grid { grid-template-columns: 1fr; } }
+
+  .cmp-card { padding: 14px 16px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.55; }
+  .cmp-bad { background: var(--danger-light); border: 1px solid var(--danger-border); color: var(--danger-text); }
+  .cmp-good { background: var(--success-light); border: 1px solid var(--success-border); color: var(--success-text); }
+  .cmp-card ul { padding-left: 18px; margin-top: 4px; }
+
+  .cmp-badge { display: inline-block; font-weight: 800; font-size: 12px; padding: 2px 8px; border-radius: 4px; margin-bottom: 6px; }
+  .badge-bad { background: var(--danger-light); color: var(--danger-text); }
+  .badge-good { background: var(--success-light); color: var(--success-text); }
+
+  .faq-item { border-bottom: 1px solid var(--border-soft); padding: 10px 0; }
+  .faq-item:last-child { border-bottom: none; }
+
+  .faq-q { font-size: 14px; font-weight: 700; color: var(--text-body); cursor: default; display: flex; align-items: flex-start; gap: 8px; }
+  .faq-q::before { content: "Q."; color: var(--primary); font-weight: 800; flex-shrink: 0; }
+  .faq-a { font-size: 13px; color: var(--text-muted); padding: 8px 0 4px 22px; line-height: 1.55; }
+
+  .checklist { display: flex; flex-direction: column; gap: 8px; font-size: 13px; color: var(--text-body); }
+  .check-label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+  .check-label input { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; margin-top: 2px; flex-shrink: 0; }
+
+  .action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--border);
+  }
+  .action-row > span { font-size: 13px; color: var(--text-muted); }
+
+  .btn-submit {
+    background: var(--primary);
+    color: #ffffff;
+    padding: 11px 20px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-submit:hover { background: var(--primary-dark); }
+  .btn-submit.dark-cta { background: var(--heading); }
+
+  .qa-box {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 24px;
+    margin-top: 44px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .qa-box-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .qa-box-header .ico { font-size: 22px; }
+  .qa-box-header h3 { font-size: 16px; font-weight: 800; color: var(--heading); }
+  .qa-box > p { font-size: 13px; color: var(--text-soft); }
+
+  .qa-code-block {
+    background: var(--surface-alt);
+    border: 1px solid var(--border-track);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-family: 'SFMono-Regular', Consolas, Menlo, monospace;
+    font-size: 13px;
+    color: var(--text-body);
+    margin: 12px 0;
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+
+  .btn-copy {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  .btn-copy:hover { background: var(--surface-alt); border-color: var(--border-strong); }
+
+  #toast {
+    position: fixed;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #0f172a;
+    color: #ffffff;
+    padding: 12px 22px;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 10000;
+    max-width: calc(100vw - 32px);
+    text-align: center;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Passcode Gate -->
+<div id="gate-overlay">
+  <div class="gate-card">
+    <div class="gate-icon">🔒</div>
+    <h2 class="gate-title">돈벌자매 수강생 라운지</h2>
+    <p class="gate-desc">컨설팅 수강생 전용 허브입니다.<br>공유받으신 <strong>입장 코드</strong>를 입력해 주세요.</p>
+    <input type="password" id="gate-pass" class="gate-input" placeholder="비밀번호 입력" autofocus />
+    <button class="gate-btn" onclick="checkGatePassword()">입장하기</button>
+    <div id="gate-error" class="gate-error">비밀번호가 올바르지 않습니다.</div>
+  </div>
+</div>
+
+<div class="app-container">
+
+  <header class="header">
+    <div class="brand-badge">🔥 돈벌자매 2:1 밀착케어 로켓그로스 실전 허브</div>
+    <h1>돈벌자매 수강생 라운지</h1>
+    <p>강의 VOD 시청부터 마진 계산기, 실무 치트키, 과제 제출까지 한곳에서 빠르게 해결하세요.</p>
+  </header>
+
+  <!-- 로드맵 -->
+  <div class="section-title"><span class="ico">🗺️</span> 로켓그로스 실전 8단계 맵</div>
+  <div class="roadmap-card">
+    <div class="roadmap-track">
+      <div class="roadmap-step"><div class="step-circle">1</div><div class="step-title">상품 찾기</div><div class="step-sub">키워드 소싱</div></div>
+      <div class="roadmap-step"><div class="step-circle">2</div><div class="step-title">마진 계산</div><div class="step-sub">판매가 산출</div></div>
+      <div class="roadmap-step"><div class="step-circle">3</div><div class="step-title">상품 구매</div><div class="step-sub">도매꾹/1688</div></div>
+      <div class="roadmap-step"><div class="step-circle">4</div><div class="step-title">썸네일 제작</div><div class="step-sub">클릭률 극대화</div></div>
+      <div class="roadmap-step"><div class="step-circle">5</div><div class="step-title">상세페이지</div><div class="step-sub">설득형 기획</div></div>
+      <div class="roadmap-step"><div class="step-circle">6</div><div class="step-title">상품 등록</div><div class="step-sub">윙(Wing) 가이드</div></div>
+      <div class="roadmap-step"><div class="step-circle">7</div><div class="step-title">창고 입고</div><div class="step-sub">로켓그로스</div></div>
+      <div class="roadmap-step"><div class="step-circle">8</div><div class="step-title">판매 &amp; 광고</div><div class="step-sub">ROAS 최적화</div></div>
+    </div>
+  </div>
+
+  <!-- 도구함 -->
+  <div class="section-title"><span class="ico">🧰</span> 돈벌자매 필수 도구함 (원클릭 치트키)</div>
+  <div class="toolbar-grid">
+    <a href="margin.html" target="_blank" rel="noopener" class="tool-btn">
+      <div class="tool-icon icon-calc">🧮</div>
+      <div class="tool-info"><h4>로켓그로스 마진 계산기</h4><p>수수료·입출고비 실마진 자동 산출</p></div>
+    </a>
+    <a href="ad-report.html" target="_blank" rel="noopener" class="tool-btn">
+      <div class="tool-icon icon-gpt">📈</div>
+      <div class="tool-info"><h4>광고 보고서 분석</h4><p>광고 보고서 올리면 수익 여부 자동 진단</p></div>
+    </a>
+  </div>
+
+  <!-- 단계별 가이드 -->
+  <div class="section-title"><span class="ico">✅</span> 단계별 실전 가이드 &amp; 과제 안내</div>
+
+  <!-- STEP 0 -->
+  <div class="step-card active" id="card-step0">
+    <button type="button" class="step-header" onclick="toggleCard('card-step0')" aria-expanded="true" aria-controls="body-step0">
+      <span class="step-header-left"><span class="step-tag">STEP 0</span><h3>OT 사전 워밍업 가이드</h3></span>
+      <span class="step-toggle-icon">▾</span>
+    </button>
+    <div class="step-body" id="body-step0">
+      <div class="module-box">
+        <div class="module-title">📘 OT 전 꼭 읽어주세요</div>
+        <div class="action-row" style="margin-top:0; padding-top:0; border-top:none;">
+          <span>본격적인 시작 전, 사전 워밍업 가이드를 먼저 확인해 주세요.</span>
+          <a href="https://docs.google.com/document/d/1iC4ooRYj96fmdBFECuqadImrDza1bgONF849cm6ezNQ/edit?tab=t.0#heading=h.azrkc76vahtf" target="_blank" rel="noopener" class="btn-submit">📖 OT 사전 워밍업 가이드 보기</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-card active" id="card-step1">
+    <button type="button" class="step-header" onclick="toggleCard('card-step1')" aria-expanded="true" aria-controls="body-step1">
+      <span class="step-header-left"><span class="step-tag">STEP 1</span><h3>불사자 프로그램 활용 &amp; 키워드 100개 발굴</h3></span>
+      <span class="step-toggle-icon">▾</span>
+    </button>
+    <div class="step-body" id="body-step1">
+
+      <div class="module-box">
+        <div class="module-title">📺 필수 VOD 영상</div>
+        <p style="font-size:12.5px; color:var(--text-muted); margin:-4px 0 12px;">※ 모든 강의 영상은 러닝아넥스 &lt;내 클래스&gt;에서 시청하실 수 있어요.</p>
+        <div class="vod-list">
+          <div class="vod-item"><div class="vod-item-left">▶️<span class="vod-item-title">1강 강의 VOD 복습</span></div><span style="font-size:12px; font-weight:700; color:var(--primary); background:var(--primary-light); padding:3px 10px; border-radius:9999px; flex-shrink:0;">📍 러닝아넥스 &lt;내 클래스&gt;에서 시청</span></div>
+        </div>
+      </div>
+
+      <div class="module-box">
+        <div class="module-title">⚠️ 초보 사입 절대 금지 품목 &amp; 합격 기준</div>
+        <div class="comparison-grid">
+          <div class="cmp-card cmp-bad">
+            <span class="cmp-badge badge-bad">절대 사입 금지 품목</span>
+            <ul>
+              <li>식품, 건강기능식품, 화장품 (유통기한/식약처 인증)</li>
+              <li>KC 인증 필요한 전자제품 (인증 비용 수백만 원)</li>
+              <li>1만 원 미만 저마진 상품, 의료기기, 상품권</li>
+            </ul>
+          </div>
+          <div class="cmp-card cmp-good">
+            <span class="cmp-badge badge-good">합격 키워드 기준</span>
+            <ul>
+              <li>판매자 로켓 비율이 높은 상품군</li>
+              <li>판매가 10,000원 이상 책정 가능한 상품군</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="module-box">
+        <div class="module-title">❓ 질문 전 필수 확인 (FAQ)</div>
+        <div class="faq-item">
+          <div class="faq-q">비브랜드 필터를 걸었는데 대기업 브랜드 제품이 나와요.</div>
+          <div class="faq-a">프로그램 분류상 간혹 브랜드 키워드가 섞일 수 있습니다. 상표권 분쟁 위험이 있으니 이름에 브랜드가 들어간 키워드는 즉시 제외하세요.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">키워드 검색량은 최소 몇 이상이어야 하나요?</div>
+          <div class="faq-a">월간 검색량 2,000 ~ 15,000건 사이의 중소형 롱테일 키워드가 초보 셀러가 첫 승리를 거두기에 가장 안전합니다.</div>
+        </div>
+      </div>
+
+      <div class="module-box">
+        <div class="module-title">☑️ 제출 전 셀프 검증</div>
+        <div class="checklist">
+          <label class="check-label"><input type="checkbox"> 사입 금지 5대 품목(식품/화장품/전자제품/인증품)을 모두 배제했나요?</label>
+          <label class="check-label"><input type="checkbox"> 돈벌자매 엑셀 포맷에 키워드 후보군을 100개 이상 정리했나요?</label>
+          <label class="check-label"><input type="checkbox"> 관심 분야 우선순위 상품 10개를 엑셀에 체크 표시했나요?</label>
+        </div>
+        <div class="action-row">
+          <span>체크를 모두 마쳤다면 과제 링크를 제출해 주세요.</span>
+          <span style="font-size:14px; font-weight:700; color:var(--primary);">💬 과제 제출 : 카카오톡으로 제출</span>
+        </div>
+      </div>
+
+      <div class="module-box">
+        <div class="module-title">📊 상품소싱 STEP 자료 LIST</div>
+        <div class="toolbar-grid" style="margin-bottom:0;">
+          <a href="https://drive.google.com/uc?export=download&amp;id=1Uvdq55T7UtQLyvM5g_Q6CU3N1PHhG5sw" target="_blank" rel="noopener" class="tool-btn">
+            <div class="tool-icon icon-excel">📊</div>
+            <div class="tool-info"><h4>소싱 체크리스트 포맷 다운로드</h4><p>엑셀(.xlsx) 다운로드</p></div>
+          </a>
+          <a href="https://drive.google.com/uc?export=download&amp;id=1MAIm_KsQ6Lx2b7m6c1YjcZrSBZDgM3oC" target="_blank" rel="noopener" class="tool-btn">
+            <div class="tool-icon icon-gpt">🔑</div>
+            <div class="tool-info"><h4>불사자 키워드 찾기</h4><p>PDF 가이드 다운로드</p></div>
+          </a>
+          <a href="https://drive.google.com/uc?export=download&amp;id=1bfHLKIaPIPABGmRrOVC0nqJuT_5PRnu7" target="_blank" rel="noopener" class="tool-btn">
+            <div class="tool-icon icon-calc">🛒</div>
+            <div class="tool-info"><h4>쿠팡에서 소싱할 상품 찾기</h4><p>PDF 가이드 다운로드</p></div>
+          </a>
+          <a href="https://drive.google.com/uc?export=download&amp;id=1H4VR-nHhBwk1SAV5QgN9rlpfsgkPy27S" target="_blank" rel="noopener" class="tool-btn">
+            <div class="tool-icon icon-cn">📈</div>
+            <div class="tool-info"><h4>쿠팡 판매량 파악 및 키워드 검증</h4><p>PDF 가이드 다운로드</p></div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-card" id="card-step2">
+    <button type="button" class="step-header" onclick="toggleCard('card-step2')" aria-expanded="false" aria-controls="body-step2">
+      <span class="step-header-left"><span class="step-tag">STEP 2</span><h3>도매처 발굴 (도매꾹/1688) &amp; 1차 마진 검증</h3></span>
+      <span class="step-toggle-icon">▾</span>
+    </button>
+    <div class="step-body" id="body-step2">
+
+      <div class="module-box">
+        <div class="module-title">📺 2강 수강 전 필수 예습 VOD</div>
+        <p style="font-size:12.5px; color:var(--text-muted); margin:-4px 0 12px;">※ 아래 강의 영상은 러닝아넥스 홈페이지 &lt;내 클래스&gt;에 모두 업로드되어 있어요. 러닝아넥스에서 확인해 주세요.</p>
+        <div class="vod-list">
+          <div class="vod-item"><div class="vod-item-left">▶️<span class="vod-item-title">국내 도매 검색 및 발주법</span></div><span style="font-size:12px; font-weight:700; color:var(--primary); background:var(--primary-light); padding:3px 10px; border-radius:9999px; flex-shrink:0;">📍 러닝아넥스 &lt;내 클래스&gt;에서 시청</span></div>
+          <div class="vod-item"><div class="vod-item-left">▶️<span class="vod-item-title">1688 가입법</span></div><span style="font-size:12px; font-weight:700; color:var(--primary); background:var(--primary-light); padding:3px 10px; border-radius:9999px; flex-shrink:0;">📍 러닝아넥스 &lt;내 클래스&gt;에서 시청</span></div>
+          <div class="vod-item"><div class="vod-item-left">▶️<span class="vod-item-title">중국 도매 검색 및 발주법</span></div><span style="font-size:12px; font-weight:700; color:var(--primary); background:var(--primary-light); padding:3px 10px; border-radius:9999px; flex-shrink:0;">📍 러닝아넥스 &lt;내 클래스&gt;에서 시청</span></div>
+          <div class="vod-item"><div class="vod-item-left">▶️<span class="vod-item-title">원가 확인 및 마진계산</span></div><span style="font-size:12px; font-weight:700; color:var(--primary); background:var(--primary-light); padding:3px 10px; border-radius:9999px; flex-shrink:0;">📍 러닝아넥스 &lt;내 클래스&gt;에서 시청</span></div>
+        </div>
+      </div>
+
+      <div class="module-box">
+        <div class="module-title">📺 필수 VOD 영상</div>
+        <div class="vod-list">
+          <div class="vod-item"><div class="vod-item-left">▶️<span class="vod-item-title">2강 강의 VOD 복습</span></div><span style="font-size:12px; font-weight:700; color:var(--primary); background:var(--primary-light); padding:3px 10px; border-radius:9999px; flex-shrink:0;">📍 러닝아넥스 &lt;내 클래스&gt;에서 시청</span></div>
+        </div>
+      </div>
+
+      <div class="module-box">
+        <div class="action-row" style="margin-top:0; padding-top:0; border-top:none;">
+          <span>마진 검증 완료 후 샘플 후보를 제출하세요.</span>
+          <span style="font-size:14px; font-weight:700; color:var(--primary);">💬 과제 제출 : 카카오톡으로 제출</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-card" id="card-step3">
+    <button type="button" class="step-header" onclick="toggleCard('card-step3')" aria-expanded="false" aria-controls="body-step3">
+      <span class="step-header-left"><span class="step-tag">STEP 3</span><h3>팔리는 썸네일 &amp; 설득형 상세페이지 (3강 VOD 풀코스)</h3></span>
+      <span class="step-toggle-icon">▾</span>
+    </button>
+    <div class="step-body" id="body-step3">
+
+      <div class="module-box">
+        <div class="module-title">📺 3강 VOD 풀코스</div>
+        <div class="vod-list">
+          <div class="vod-item"><div class="vod-item-left">▶️<span class="vod-item-title">썸네일, 상세페이지의 개념과 쿠팡 기준</span></div><span style="font-size:12px; font-weight:700; color:var(--primary); background:var(--primary-light); padding:3px 10px; border-radius:9999px; flex-shrink:0;">📍 러닝아넥스 &lt;내 클래스&gt;에서 시청</span></div>
+          <div class="vod-item"><div class="vod-item-left">▶️<span class="vod-item-title">상세페이지 구성 조건</span></div><span style="font-size:12px; font-weight:700; color:var(--primary); background:var(--primary-light); padding:3px 10px; border-radius:9999px; flex-shrink:0;">📍 러닝아넥스 &lt;내 클래스&gt;에서 시청</span></div>
+          <div class="vod-item"><div class="vod-item-left">▶️<span class="vod-item-title">GPT로 썸네일, 상세페이지 만들기</span></div><span style="font-size:12px; font-weight:700; color:var(--primary); background:var(--primary-light); padding:3px 10px; border-radius:9999px; flex-shrink:0;">📍 러닝아넥스 &lt;내 클래스&gt;에서 시청</span></div>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <span>판매 예정 상품의 썸네일과 상세페이지를 제작하세요.</span>
+        <span style="font-size:14px; font-weight:700; color:var(--primary);">💬 과제 제출 : 카카오톡으로 제출</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step-card" id="card-step4">
+    <button type="button" class="step-header" onclick="toggleCard('card-step4')" aria-expanded="false" aria-controls="body-step4">
+      <span class="step-header-left"><span class="step-tag">STEP 4</span><h3>상품등록 및 쿠팡창고 입고 실전</h3></span>
+      <span class="step-toggle-icon">▾</span>
+    </button>
+    <div class="step-body" id="body-step4">
+      <div class="module-box">
+        <div class="module-title">📝 상품 등록 자료</div>
+        <div class="toolbar-grid" style="margin-bottom:0;">
+          <div class="tool-btn" style="cursor:default;">
+            <div class="tool-icon icon-gpt">📄</div>
+            <div class="tool-info"><h4>상품명 짓는 법</h4><p>PDF 제공 예정</p></div>
+          </div>
+          <div class="tool-btn" style="cursor:default;">
+            <div class="tool-icon icon-gpt">📄</div>
+            <div class="tool-info"><h4>연관 검색어 · 자동완성어 개념</h4><p>PDF 제공 예정</p></div>
+          </div>
+          <a href="https://drive.google.com/file/d/1IZk6X3qbFeyVdB11-RlzQ5owzmNWo6E2/view?usp=drive_link" target="_blank" rel="noopener" class="tool-btn">
+            <div class="tool-icon icon-calc">🎟️</div>
+            <div class="tool-info"><h4>쿠폰 생성하는 법</h4><p>※ 상품등록이 완료된 후에 쿠폰을 생성하는 순서입니다</p></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="module-box">
+        <div class="module-title">🎬 실전 영상 (유튜브)</div>
+        <div class="toolbar-grid" style="margin-bottom:0;">
+          <a href="https://youtu.be/Z1mjIneUp_M?si=ffePcUuILKguThhm" target="_blank" rel="noopener" class="tool-btn">
+            <div class="tool-icon icon-cn">▶️</div>
+            <div class="tool-info"><h4>상품 등록법</h4><p>유튜브에서 보기</p></div>
+          </a>
+          <a href="https://youtu.be/VT1Epo_5OiQ?si=9zwdYOshUnaYapRX" target="_blank" rel="noopener" class="tool-btn">
+            <div class="tool-icon icon-cn">▶️</div>
+            <div class="tool-info"><h4>그로스 입고</h4><p>유튜브에서 보기</p></div>
+          </a>
+        </div>
+      </div>
+
+      <div class="action-row">
+        <span style="font-size:14px; font-weight:700; color:var(--text-strong);">📌 과제 : 상품을 등록하고 그로스에 입고하세요.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step-card" id="card-step5">
+    <button type="button" class="step-header" onclick="toggleCard('card-step5')" aria-expanded="false" aria-controls="body-step5">
+      <span class="step-header-left"><span class="step-tag">STEP 5</span><h3>광고 세팅</h3></span>
+      <span class="step-toggle-icon">▾</span>
+    </button>
+    <div class="step-body" id="body-step5">
+      <div class="module-box">
+        <div class="module-title">📢 광고 세팅 자료</div>
+        <div class="toolbar-grid" style="margin-bottom:0;">
+          <a href="https://drive.google.com/file/d/1csxQDgPV8XWwPE8CGGV0iYWzwvXbVH2u/view?usp=drive_link" target="_blank" rel="noopener" class="tool-btn">
+            <div class="tool-icon icon-calc">📢</div>
+            <div class="tool-info"><h4>기본 광고 세팅법</h4><p>자료 열기</p></div>
+          </a>
+        </div>
+      </div>
+      <div class="module-box">
+        <div class="module-title">📈 광고 운영 가이드</div>
+        <p style="font-size:13px; color:var(--text-soft); line-height:1.7;">
+          • 광고가 <strong>학습 중</strong>인 상황에서는 변경 없이 지켜보는 것을 권장드립니다!<br>
+          • 광고의 <strong>ROAS가 내 상품의 E-ROAS보다 높아야</strong> 마진이 남고 있다는 지표이니,
+          내 상품의 E-ROAS(<a href="margin.html" target="_blank" rel="noopener" style="color:var(--primary); font-weight:700;">돈벌자매 마진계산기</a>로 계산)와 광고 ROAS를 비교해 보세요.
+        </p>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div id="toast" role="status" aria-live="polite">복사되었습니다!</div>
+
+<script>
+  // 기수가 바뀔 때는 이 비밀번호만 수정하세요.
+  var GATE_PASSWORD = "donbeol2026!";
+
+  function safeGetStorage(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function safeSetStorage(key, val) {
+    try { localStorage.setItem(key, val); } catch (e) { /* ignore */ }
+  }
+
+  // 전체 입장 비밀번호 사용 여부. false = 누구나 메인·OT 열람, STEP별 비밀번호로만 잠금
+  var GATE_ENABLED = false;
+
+  if (!GATE_ENABLED || safeGetStorage("donbeol_auth_pass") === GATE_PASSWORD) {
+    document.getElementById("gate-overlay").style.display = "none";
+  }
+
+  function checkGatePassword() {
+    var input = document.getElementById("gate-pass").value;
+    var errorMsg = document.getElementById("gate-error");
+    if (input === GATE_PASSWORD) {
+      safeSetStorage("donbeol_auth_pass", GATE_PASSWORD);
+      document.getElementById("gate-overlay").style.display = "none";
+    } else {
+      errorMsg.style.display = "block";
+    }
+  }
+
+  document.getElementById("gate-pass").addEventListener("keyup", function (e) {
+    if (e.key === "Enter") checkGatePassword();
+  });
+
+  function toggleCard(cardId) {
+    var card = document.getElementById(cardId);
+    var btn = card.querySelector(".step-header");
+    var isActive = card.classList.toggle("active");
+    if (btn) btn.setAttribute("aria-expanded", isActive ? "true" : "false");
+  }
+
+  var toastTimer = null;
+  function showToast(msg) {
+    var toast = document.getElementById("toast");
+    toast.innerText = msg;
+    toast.classList.add("show");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.classList.remove("show"); }, 2000);
+  }
+
+  function copyToClipboard(text, successMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        showToast(successMsg);
+      }).catch(function () {
+        fallbackCopy(text, successMsg);
+      });
+    } else {
+      fallbackCopy(text, successMsg);
+    }
+  }
+
+  function fallbackCopy(text, successMsg) {
+    try {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      showToast(successMsg);
+    } catch (e) {
+      showToast("복사에 실패했어요. 직접 선택해 복사해 주세요.");
+    }
+  }
+
+  function copyGptPrompt() {
+    var promptText = "[역할] 너는 쿠팡 로켓그로스 전문 상세페이지 카피라이터야.\n[상품명]: (여기에 상품 입력)\n[타깃 고객]: (예: 2030 1인 가구 직장인)\n[핵심 장점 3가지]: \n1. \n2. \n3. \n\n위 내용을 바탕으로 쿠팡 고객의 지갑을 여는 설득형 상세페이지 도입부 후킹 카피 5개를 작성해 줘.";
+    copyToClipboard(promptText, "GPT 프롬프트가 복사되었습니다!");
+  }
+
+  function copyChinaChat() {
+    var cnChatText = "1. 샘플 구매 문의: 可以先买一个样品看质量吗？ (샘플 1개 먼저 살 수 있나요?)\n2. 한국 발송 포장 보강: 发往韩国，请务必加强外箱包装。 (한국행이니 박스 포장 신경 써주세요.)\n3. 수량 네고: 如果订购100个，价格可以优惠多少？ (100개 주문 시 단가 얼마까지 되나요?)";
+    copyToClipboard(cnChatText, "1688 필수 중국어 문장이 복사되었습니다!");
+  }
+
+</script>
+</body>
+</html>
