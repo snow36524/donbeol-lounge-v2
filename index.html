@@ -614,6 +614,20 @@
   }
   .btn-copy:hover { background: var(--surface-alt); border-color: var(--border-strong); }
 
+  /* STEP 잠금 */
+  .lock-panel { display: none; text-align: center; padding: 28px 16px; background: var(--card-bg); border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); }
+  .step-card.locked .step-body > * { display: none; }
+  .step-card.locked .step-body > .lock-panel { display: block; }
+  .lock-panel .lock-ico { font-size: 28px; margin-bottom: 6px; }
+  .lock-panel p { font-size: 13px; color: var(--text-muted); margin-bottom: 14px; }
+  .lock-form { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .lock-form input { width: 200px; max-width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-alt); color: var(--text-main); font-size: 14px; text-align: center; letter-spacing: 4px; outline: none; }
+  .lock-form input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+  .lock-form button { padding: 10px 18px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius-sm); font-weight: 700; font-size: 14px; cursor: pointer; }
+  .lock-error { display: none; margin-top: 8px; font-size: 12.5px; font-weight: 600; color: var(--danger-text); }
+  .lock-badge { font-size: 13px; margin-left: 4px; }
+  .step-card:not(.locked) .lock-badge { display: none; }
+
   #toast {
     position: fixed;
     bottom: calc(24px + env(safe-area-inset-bottom, 0px));
@@ -945,7 +959,7 @@
   }
 
   // 전체 입장 비밀번호 사용 여부. false = 누구나 메인·OT 열람, STEP별 비밀번호로만 잠금
-  var GATE_ENABLED = true;
+  var GATE_ENABLED = false;
 
   if (!GATE_ENABLED || safeGetStorage("donbeol_auth_pass") === GATE_PASSWORD) {
     document.getElementById("gate-overlay").style.display = "none";
@@ -1021,6 +1035,52 @@
     copyToClipboard(cnChatText, "1688 필수 중국어 문장이 복사되었습니다!");
   }
 
+  // ===== STEP별 비밀번호 (STEP 0 OT는 잠금 없음) =====
+  // 단계 오픈 시 수강생에게 해당 비밀번호를 카톡으로 공지하세요. 기수가 바뀌면 여기만 수정.
+  var STEP_PASSWORDS = {
+    "card-step1": "7641",
+    "card-step2": "5228",
+    "card-step3": "3632",
+    "card-step4": "4032",
+    "card-step5": "5138"
+  };
+
+  function unlockStep(cardId) {
+    var card = document.getElementById(cardId);
+    var input = card.querySelector(".lock-form input");
+    var err = card.querySelector(".lock-error");
+    if (input.value.trim() === STEP_PASSWORDS[cardId]) {
+      safeSetStorage("donbeol_unlock_" + cardId, STEP_PASSWORDS[cardId]);
+      card.classList.remove("locked");
+      showToast("잠금이 해제되었습니다!");
+    } else {
+      err.style.display = "block";
+    }
+  }
+
+  Object.keys(STEP_PASSWORDS).forEach(function (cardId) {
+    var card = document.getElementById(cardId);
+    if (!card) return;
+    var tag = card.querySelector(".step-tag");
+    if (tag) tag.insertAdjacentHTML("afterend", '<span class="lock-badge" aria-label="잠김">🔒</span>');
+    var body = card.querySelector(".step-body");
+    body.insertAdjacentHTML("afterbegin",
+      '<div class="lock-panel">' +
+        '<div class="lock-ico">🔒</div>' +
+        '<p>이 단계는 비밀번호가 필요해요.<br>카카오톡으로 안내받은 숫자 비밀번호를 입력해 주세요.</p>' +
+        '<div class="lock-form">' +
+          '<input type="password" inputmode="numeric" placeholder="숫자 4자리" />' +
+          '<button type="button">열기</button>' +
+        '</div>' +
+        '<div class="lock-error">비밀번호가 올바르지 않습니다.</div>' +
+      '</div>');
+    var input = body.querySelector(".lock-form input");
+    body.querySelector(".lock-form button").addEventListener("click", function () { unlockStep(cardId); });
+    input.addEventListener("keyup", function (e) { if (e.key === "Enter") unlockStep(cardId); });
+    if (safeGetStorage("donbeol_unlock_" + cardId) !== STEP_PASSWORDS[cardId]) {
+      card.classList.add("locked");
+    }
+  });
 </script>
 </body>
 </html>
