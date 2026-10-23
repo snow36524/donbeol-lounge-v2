@@ -529,9 +529,9 @@ function calc() {
   const margin = sellPrice - totalCost;
   const marginRate = sellPrice > 0 ? (margin / sellPrice) * 100 : 0;
   const costRate = sellPrice > 0 ? (totalCost / sellPrice) * 100 : 0;
-  // E-ROAS (엑셀 기준): 순수익 = 마진 ÷ 1.1(부가세), 최대광고비 = 순수익 × 0.909(광고비 부가세), E-ROAS = 판매가 ÷ 최대광고비
+  // E-ROAS: 순수익 = 마진 ÷ 1.1(매출 부가세), 최대광고비 = 순수익(광고비 부가세는 매입세액 공제로 비용 제외), E-ROAS = 판매가 ÷ 최대광고비
   const netProfit = margin / 1.1;
-  const maxAdCost = netProfit * 0.909;
+  const maxAdCost = netProfit;
   const eroas = maxAdCost > 0 ? (sellPrice / maxAdCost) * 100 : 0;
 
   // Render results
