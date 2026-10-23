@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>돈벌자매 - 마진계산기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans KR', -apple-system, sans-serif;
+  background: #f5f6f8;
+  color: #1a1a2e;
+  min-height: 100vh;
+}
+.container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+.header {
+  text-align: center;
+  padding: 40px 20px 30px;
+}
+.brand { font-size: 1rem; font-weight: 800; color: #6c5ce7; letter-spacing: 1px; margin-bottom: 2px; }
+.header h1 { font-size: 1.8rem; color: #1a1a2e; font-weight: 700; margin-bottom: 6px; }
+.header p { color: #9ca3af; font-size: 0.95rem; }
+
+/* Cards */
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.card h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Form rows */
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.form-row label {
+  width: 130px;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+}
+.form-row input, .form-row select {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #1a1a2e;
+  background: #f9fafb;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.form-row input:focus, .form-row select:focus {
+  outline: none;
+  border-color: #6c5ce7;
+  background: #fff;
+}
+.form-row .unit {
+  font-size: 0.85rem;
+  color: #6b7280;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.form-row .hint {
+  font-size: 0.78rem;
+  color: #9ca3af;
+}
+
+/* Source tabs */
+.source-tabs {
+  display: flex;
+  gap: 4px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 3px;
+  margin-bottom: 18px;
+}
+.source-tab {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.2s;
+}
+.source-tab.active {
+  background: #6c5ce7;
+  color: #fff;
+  font-weight: 600;
+}
+.source-tab:hover:not(.active) { background: #e5e7eb; }
+.source-panel { display: none; }
+.source-panel.active { display: block; }
+
+/* Divider */
+.divider {
+  border: none;
+  border-top: 1px solid #f3f4f6;
+  margin: 18px 0;
+}
+
+/* Two col */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+/* Result card */
+.result-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px;
+  margin-bottom: 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  text-align: center;
+}
+.result-card.highlight {
+  background: linear-gradient(135deg, #6c5ce7, #8b5cf6);
+  color: #fff;
+  border: none;
+}
+.result-card.highlight .rc-label { color: rgba(255,255,255,0.8); }
+.result-card.highlight .rc-value { color: #fff; }
+
+.rc-label {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.rc-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.rc-sub {
+  font-size: 0.88rem;
+  margin-top: 6px;
+  font-weight: 400;
+}
+
+/* Verdict */
+.verdict {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-top: 8px;
+}
+.verdict.good { background: #d1fae5; color: #059669; }
+.verdict.bad { background: #fee2e2; color: #dc2626; }
+.verdict.warn { background: #fef3c7; color: #d97706; }
+
+/* Breakdown */
+.breakdown {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 16px;
+}
+.bd-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+.bd-row:last-child { border-bottom: none; }
+.bd-row .label { color: #6b7280; }
+.bd-row .value { font-weight: 600; color: #1a1a2e; }
+.bd-row.total { border-top: 2px solid #e5e7eb; margin-top: 4px; padding-top: 12px; }
+.bd-row.total .label { font-weight: 700; color: #1a1a2e; }
+.bd-row.total .value { font-weight: 800; color: #6c5ce7; }
+
+.green { color: #10b981; }
+.red { color: #ef4444; }
+
+/* URL input */
+.url-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.url-row label {
+  width: 130px;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #374151;
+}
+.url-row input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: #6b7280;
+  background: #f9fafb;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+.url-row input:focus { outline: none; border-color: #6c5ce7; }
+
+/* Note */
+.note {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* Login screen */
+.login-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  text-align: center;
+}
+.login-screen .brand { font-size: 1.2rem; margin-bottom: 4px; }
+.login-screen h2 { font-size: 1.6rem; color: #1a1a2e; margin-bottom: 8px; }
+.login-screen p { color: #9ca3af; margin-bottom: 32px; font-size: 0.95rem; }
+.btn-google {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: #fff; border: 1px solid #d1d5db; border-radius: 12px;
+  padding: 14px 32px; font-size: 1rem; font-weight: 600;
+  color: #374151; cursor: pointer; transition: all 0.2s;
+  font-family: 'Noto Sans KR', sans-serif;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.btn-google:hover { border-color: #6c5ce7; box-shadow: 0 4px 12px rgba(108,92,231,0.15); }
+.btn-google img { width: 22px; height: 22px; }
+.user-bar {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 10px; padding: 8px 0; margin-bottom: 4px;
+}
+.user-bar img { width: 28px; height: 28px; border-radius: 50%; }
+.user-bar span { font-size: 0.82rem; color: #6b7280; }
+.btn-logout {
+  background: none; border: 1px solid #e5e7eb; color: #9ca3af;
+  padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.78rem;
+}
+.btn-logout:hover { border-color: #ef4444; color: #ef4444; }
+
+/* Responsive */
+@media (max-width: 600px) {
+  .two-col { grid-template-columns: 1fr; }
+  .rc-value { font-size: 1.8rem; }
+  .container { padding: 12px; }
+  .form-row label { width: 100px; font-size: 0.83rem; }
+  .form-row { gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Login Screen -->
+  <div class="login-screen" id="loginScreen">
+    <div class="brand">돈벌자매</div>
+    <h2>마진계산기</h2>
+    <p>로그인 후 마진을 계산해 보세요</p>
+    <button class="btn-google" id="btnGoogleLogin">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Google 계정으로 로그인
+    </button>
+  </div>
+
+  <!-- App Content (hidden until login) -->
+  <div id="appContent" style="display:none;">
+  <div class="user-bar" id="userBar">
+    <img id="userPhoto" src="" alt="">
+    <span id="userName"></span>
+    <button class="btn-logout" id="btnLogout">로그아웃</button>
+  </div>
+
+  <div class="header">
+    <div class="brand">돈벌자매</div>
+    <h1>마진계산기</h1>
+    <p>판매가와 원가만 넣으면 마진이 얼마인지 바로 알려드려요</p>
+  </div>
+
+  <!-- 판매가 -->
+  <div class="card">
+    <h3>💰 예상 판매가</h3>
+    <div class="form-row">
+      <label>판매가</label>
+      <input type="text" id="sellPrice" placeholder="예: 19900" inputmode="numeric">
+      <span class="unit">원</span>
+    </div>
+  </div>
+
+  <!-- 원가 -->
+  <div class="card">
+    <h3>📦 예상 원가</h3>
+    <div class="source-tabs">
+      <button class="source-tab active" data-source="china">중국 사입</button>
+      <button class="source-tab" data-source="domestic">국내 도매</button>
+    </div>
+
+    <!-- 중국 사입 -->
+    <div class="source-panel active" id="panel-china">
+      <div class="form-row">
+        <label>중국 원가</label>
+        <input type="text" id="chinaPrice" placeholder="예: 15" inputmode="numeric">
+        <span class="unit">위안</span>
+      </div>
+      <div class="form-row">
+        <label>환율+부대비용 (1위안당, 약 300원)</label>
+        <input type="text" id="exchangeRate" placeholder="예: 300" value="300" inputmode="numeric">
+        <span class="unit">원</span>
+      </div>
+      <div class="form-row">
+        <label>예상 원가</label>
+        <input type="text" id="chinaCostKRW" readonly style="background:#f3f4f6;font-weight:600;">
+        <span class="unit">원</span>
+      </div>
+    </div>
+
+    <!-- 국내 도매 -->
+    <div class="source-panel" id="panel-domestic">
+      <div class="form-row">
+        <label>도매 원가</label>
+        <input type="text" id="domesticPrice" placeholder="예: 7220" inputmode="numeric">
+        <span class="unit">원</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 배송비 & 수수료 -->
+  <div class="card">
+    <h3>🚚 배송비 & 수수료</h3>
+    <a href="https://wing.coupang.com/tenants/rfm/settlements/fee-information?utm_source=faq" target="_blank" rel="noopener"
+       style="display:flex; align-items:center; justify-content:center; gap:8px; margin:-4px 0 18px; padding:12px 16px; background:#6c5ce7; color:#fff; border-radius:12px; text-decoration:none; font-weight:700; font-size:0.95rem;">
+      🔍 쿠팡 로켓그로스 비용·수수료 확인하기
+    </a>
+    <div class="form-row">
+      <label>로켓그로스 입출고배송비</label>
+      <input type="text" id="rocketFee" placeholder="예: 1000" value="0" inputmode="numeric">
+      <span class="unit">원</span>
+    </div>
+    <div class="form-row">
+      <label>입출고배송비 부가세 (10%)</label>
+      <input type="text" id="rocketVat" readonly style="background:#f3f4f6;font-weight:600;">
+      <span class="unit">원</span>
+    </div>
+    <div class="form-row">
+      <label>최종 입출고배송비</label>
+      <input type="text" id="rocketTotal" readonly style="background:#f3f4f6;font-weight:700;color:#6c5ce7;">
+      <span class="unit">원</span>
+    </div>
+    <hr class="divider">
+    <div class="form-row">
+      <label>판매 수수료율</label>
+      <input type="text" id="commissionRate" placeholder="예: 9.6" value="9.6" inputmode="decimal">
+      <span class="unit">%</span>
+    </div>
+    <div class="form-row">
+      <label>판매 수수료</label>
+      <input type="text" id="commissionAmt" readonly style="background:#f3f4f6;font-weight:600;">
+      <span class="unit">원</span>
+    </div>
+    <div class="form-row">
+      <label>부가세 (10%)</label>
+      <input type="text" id="commissionVat" readonly style="background:#f3f4f6;font-weight:600;">
+      <span class="unit">원</span>
+    </div>
+    <div class="form-row">
+      <label>최종 수수료</label>
+      <input type="text" id="commissionTotal" readonly style="background:#f3f4f6;font-weight:700;color:#6c5ce7;">
+      <span class="unit">원</span>
+    </div>
+    <div class="note">*쿠팡 수수료는 카테고리별 상이, 직접 입력</div>
+  </div>
+
+  <!-- 결과 -->
+  <div id="results"></div>
+
+  <div class="card">
+    <h3>📎 참고 자료</h3>
+    <a href="https://drive.google.com/file/d/1ENIRGu4uTlEFpCWUchX6kBTqcppX-foa/view?usp=drive_link" target="_blank" rel="noopener"
+       style="display:flex; align-items:center; gap:12px; padding:14px 16px; border:1px solid #e5e7eb; border-radius:14px; text-decoration:none; color:#1a1a2e; background:#fafafa;">
+      <span style="font-size:1.4rem;">📄</span>
+      <span><strong style="display:block; font-size:0.95rem;">로켓그로스 수수료 확인하는 법</strong>
+      <span style="font-size:0.8rem; color:#9ca3af;">입출고배송비·판매 수수료율 확인 방법 자료 열기</span></span>
+    </a>
+  </div>
+  </div><!-- /appContent -->
+</div>
+
+<script>
+// ============ FIREBASE AUTH ============
+// 로그인 없이 바로 사용. 구글 로그인을 다시 켜려면 true로 바꾸세요.
+const REQUIRE_LOGIN = false;
+if (!REQUIRE_LOGIN) {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appContent').style.display = 'block';
+  document.getElementById('userBar').style.display = 'none';
+}
+const firebaseConfig = {
+  apiKey: "AIzaSyD4lgQjG_UZXpalJXDiW9jEaw28uhI3Km0",
+  authDomain: "donbuljamae-tools.firebaseapp.com",
+  projectId: "donbuljamae-tools",
+  storageBucket: "donbuljamae-tools.firebasestorage.app",
+  messagingSenderId: "908116115151",
+  appId: "1:908116115151:web:d552c5cecf2a7360d701ba",
+  measurementId: "G-TVK4V69M7T"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+
+document.getElementById('btnGoogleLogin').addEventListener('click', () => {
+  auth.signInWithPopup(provider).catch(err => {
+    if (err.code === 'auth/popup-blocked') {
+      alert('팝업이 차단되었습니다. 브라우저 주소창 오른쪽의 팝업 차단 아이콘을 클릭해서 허용해 주세요.');
+    } else if (err.code !== 'auth/popup-closed-by-user') {
+      alert('로그인 오류: ' + err.message);
+    }
+  });
+});
+document.getElementById('btnLogout').addEventListener('click', () => auth.signOut());
+
+if (REQUIRE_LOGIN) auth.onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+    document.getElementById('userPhoto').src = user.photoURL || '';
+    document.getElementById('userName').textContent = user.displayName || user.email;
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('appContent').style.display = 'none';
+  }
+});
+</script>
+
+<script>
+function n(id) {
+  const el = document.getElementById(id);
+  const v = el.value.replace(/[,\s원위안%]/g, '');
+  return parseFloat(v) || 0;
+}
+function fmt(v) { return '₩' + Math.round(v).toLocaleString(); }
+
+// Source tab toggle
+document.querySelectorAll('.source-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.source-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.source-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.source).classList.add('active');
+    calc();
+  });
+});
+
+// Auto-calculate on any input
+document.querySelectorAll('input').forEach(inp => {
+  inp.addEventListener('input', calc);
+});
+
+function getSource() {
+  return document.querySelector('.source-tab.active').dataset.source;
+}
+
+function calc() {
+  const sellPrice = n('sellPrice');
+  const source = getSource();
+
+  // 원가
+  let cost = 0;
+  if (source === 'china') {
+    const chinaPrice = n('chinaPrice');
+    const rate = n('exchangeRate');
+    cost = chinaPrice * rate;
+    document.getElementById('chinaCostKRW').value = cost > 0 ? Math.round(cost).toLocaleString() : '';
+  } else {
+    cost = n('domesticPrice');
+  }
+
+  // 배송비
+  const rocketBase = n('rocketFee');
+  const rocketVat = rocketBase * 0.1;
+  const rocket = rocketBase + rocketVat;
+  document.getElementById('rocketVat').value = rocketVat > 0 ? Math.round(rocketVat).toLocaleString() : '';
+  document.getElementById('rocketTotal').value = rocket > 0 ? Math.round(rocket).toLocaleString() : '';
+
+  // 수수료
+  const commRate = n('commissionRate') / 100;
+  const commission = sellPrice * commRate;
+  const vat = commission * 0.1;
+  const finalCommission = commission + vat;
+  document.getElementById('commissionAmt').value = commission > 0 ? Math.round(commission).toLocaleString() : '';
+  document.getElementById('commissionVat').value = vat > 0 ? Math.round(vat).toLocaleString() : '';
+  document.getElementById('commissionTotal').value = finalCommission > 0 ? Math.round(finalCommission).toLocaleString() : '';
+
+  // 총원가
+  const totalCost = cost + rocket + finalCommission;
+
+  // 마진
+  const margin = sellPrice - totalCost;
+  const marginRate = sellPrice > 0 ? (margin / sellPrice) * 100 : 0;
+  const costRate = sellPrice > 0 ? (totalCost / sellPrice) * 100 : 0;
+  // E-ROAS: 순수익 = 마진 ÷ 1.1(매출 부가세), 최대광고비 = 순수익(광고비 부가세는 매입세액 공제로 비용 제외), E-ROAS = 판매가 ÷ 최대광고비
+  const netProfit = margin / 1.1;
+  const maxAdCost = netProfit;
+  const eroas = maxAdCost > 0 ? (sellPrice / maxAdCost) * 100 : 0;
+
+  // Render results
+  const results = document.getElementById('results');
+  if (sellPrice <= 0) { results.innerHTML = ''; return; }
+
+  let verdictClass;
+  if (marginRate >= 30) { verdictClass = 'good'; }
+  else if (marginRate > 0) { verdictClass = 'warn'; }
+  else { verdictClass = 'bad'; }
+
+  let html = '';
+
+  // 마진 결과
+  html += `
+    <div class="result-card highlight">
+      <div class="rc-label">1개 팔면 남는 돈</div>
+      <div class="rc-value">${margin >= 0 ? '+' : ''}${fmt(margin)}</div>
+      <div class="rc-sub">마진율 ${marginRate.toFixed(1)}%</div>
+    </div>
+  `;
+
+  // 두 칸
+  html += `<div class="two-col">
+    <div class="result-card">
+      <div class="rc-label">📊 원가율</div>
+      <div class="rc-value" style="color:${costRate <= 70 ? '#10b981' : '#ef4444'}">${costRate.toFixed(1)}%</div>
+      <div class="rc-sub" style="color:#9ca3af;">판매가 중 원가 비중</div>
+    </div>
+    <div class="result-card">
+      <div class="rc-label">🎯 E-ROAS</div>
+      <div class="rc-value" style="color:${maxAdCost <= 0 ? '#ef4444' : eroas <= 300 ? '#10b981' : eroas <= 500 ? '#f59e0b' : '#ef4444'}">${maxAdCost > 0 ? eroas.toFixed(2) + '%' : '적자'}</div>
+      <div class="rc-sub" style="color:#9ca3af;">최대광고비 ${maxAdCost > 0 ? fmt(maxAdCost) : '-'} · 이 이상 ROAS가 나와야 수익</div>
+    </div>
+  </div>`;
+
+  // 비용 상세
+  html += `<div class="card">
+    <h3>📋 비용 상세</h3>
+    <div class="breakdown">
+      <div class="bd-row">
+        <span class="label">판매가</span>
+        <span class="value">${fmt(sellPrice)}</span>
+      </div>
+      <div class="bd-row">
+        <span class="label">원가 (${source === 'china' ? '중국 사입' : '국내 도매'})</span>
+        <span class="value">${fmt(cost)}</span>
+      </div>
+      ${rocket > 0 ? `<div class="bd-row">
+        <span class="label">로켓그로스 입출고배송비 (부가세 포함)</span>
+        <span class="value">${fmt(rocket)}</span>
+      </div>` : ''}
+      <div class="bd-row">
+        <span class="label">판매 수수료 (${n('commissionRate')}%)</span>
+        <span class="value">${fmt(commission)}</span>
+      </div>
+      <div class="bd-row">
+        <span class="label">수수료 부가세 (10%)</span>
+        <span class="value">${fmt(vat)}</span>
+      </div>
+      <div class="bd-row">
+        <span class="label">최종 수수료 (수수료 + 부가세)</span>
+        <span class="value">${fmt(finalCommission)}</span>
+      </div>
+      <div class="bd-row total">
+        <span class="label">총원가</span>
+        <span class="value">${fmt(totalCost)}</span>
+      </div>
+      <div class="bd-row total">
+        <span class="label">마진</span>
+        <span class="value ${margin >= 0 ? 'green' : 'red'}">${margin >= 0 ? '+' : ''}${fmt(margin)}</span>
+      </div>
+    </div>
+  </div>`;
+
+  results.innerHTML = html;
+}
+
+// Initial calc
+calc();
+</script>
+</body>
+</html>
